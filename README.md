@@ -37,7 +37,6 @@ curl -X POST http://localhost:3000/api/service/whisper \
 ```
 
 - Notes:
-  - Requires `OPENAI_API_KEY` (or `OPENAI_API`) in environment.
   - Large files are supported by Whisper; typical upload limits depend on your server and deployment proxy (Vercel, Nginx, etc.).
 
 ### 2) Google Cloud STT service
