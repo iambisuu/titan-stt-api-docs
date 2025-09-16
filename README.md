@@ -2,6 +2,8 @@
 
 The project exposes two stable microservice endpoints for speech-to-text over HTTP using multipart/form-data uploads.
 
+Base url: https://titan-stt-bot.vercel.app/
+
 ### 1) OpenAI Whisper service
 
 - Method: POST
