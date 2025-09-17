@@ -1,10 +1,54 @@
 ## Service APIs
 
-The project exposes two stable microservice endpoints for speech-to-text over HTTP using multipart/form-data uploads.
+The project exposes three stable microservice endpoints: two for speech-to-text and one for Notion integration.
 
 Base url: https://titan-stt-bot.vercel.app/
 
-### 1) OpenAI Whisper service
+### 1) Notion Integration service
+
+- Method: POST
+- URL: `/api/notion`
+- Headers:
+  - `Accept: application/json`
+- Body (multipart/form-data):
+  - `clientName` (optional): string, e.g. `"John Doe"`
+  - `meetingDate` (optional): ISO date string, e.g. `"2024-01-15T10:30:00Z"`. Defaults to current date.
+  - `transcription` (required): string, the transcribed text
+  - `audioFile` (optional): audio file (MP3, WAV, etc.) to upload to Cloudinary
+  - `personalNotes` (optional): string, additional notes
+  - `meetingSummary` (optional): string, meeting summary
+- Response (JSON):
+
+```
+{
+  "success": true,
+  "message": "Meeting record created in Notion",
+  "pageId": "12345678-1234-1234-1234-123456789abc",
+  "url": "https://notion.so/12345678123412341234123456789abc",
+  "audioUrl": "https://res.cloudinary.com/.../audio.mp3",
+  "used_database_id": "26f9fd15-6b5d-809c-831c-d460edd3ab0f"
+}
+```
+
+- Example cURL:
+
+```
+curl -X POST http://localhost:3000/api/notion \
+  -F "clientName=John Doe" \
+  -F "meetingDate=2024-01-15T10:30:00Z" \
+  -F "transcription=Meeting discussion about project requirements..." \
+  -F "audioFile=@meeting-recording.mp3" \
+  -F "personalNotes=Important decisions made" \
+  -F "meetingSummary=Project kickoff meeting"
+```
+
+- Notes:
+  - Requires `NOTION_INTEGRATION_SECRET` and `CLOUDINARY_URL` in environment variables
+  - Audio files are uploaded to Cloudinary and linked in Notion (Notion doesn't support direct audio uploads)
+  - Long transcriptions (>2000 chars) are split into multiple blocks in the Notion page
+  - Creates a new page in the specified Notion database with all provided data
+
+### 2) OpenAI Whisper service
 
 - Method: POST
 - URL: `/api/service/whisper`
@@ -39,7 +83,7 @@ curl -X POST http://localhost:3000/api/service/whisper \
 - Notes:
   - Large files are supported by Whisper; typical upload limits depend on your server and deployment proxy (Vercel, Nginx, etc.).
 
-### 2) Google Cloud STT service
+### 3) Google Cloud STT service
 
 - Method: POST
 - URL: `/api/service/gcp`
